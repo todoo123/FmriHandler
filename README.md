@@ -4,19 +4,19 @@ Layered fMRI ROI Clustering Framework
 
 ---
 
-## Overview
+## 개요 (Overview)
 
-`fmriroi` is a modular and extensible Python package for ROI-based fMRI analysis.
+`fmriroi`는 ROI 기반 fMRI 분석을 위한 모듈형 Python 패키지입니다.
 
-It implements a **5-layer pipeline architecture**:
+본 패키지는 다음과 같은 **5단계 레이어 아키텍처**를 기반으로 설계되었습니다:
 
 1. **Data Model**
-2. **Transform (Preprocessing / Dimension Reduction)**
-3. **Similarity Computation**
+2. **Transform (전처리 / 차원축소)**
+3. **Similarity Computation (유사도 계산)**
 4. **Clustering**
 5. **Visualization & Reporting**
 
-The design enforces a clean, unidirectional workflow:
+데이터는 아래와 같은 단방향 흐름을 따릅니다:
 
 ```
 
@@ -27,23 +27,22 @@ FMRIData
 
 ````
 
-Each layer is represented by a dedicated class, while computational engines are implemented in separate modules for clarity and extensibility.
+각 레이어는 하나의 클래스 객체로 표현되며,  
+실제 계산 알고리즘은 별도의 모듈로 분리되어 있습니다.
 
 ---
 
-## Design Philosophy
+## 설계 철학 (Design Philosophy)
 
-- Clear separation between **state objects** and **algorithm engines**
-- Layered, one-directional data flow
-- Minimal but explicit metadata tracking
-- Research-oriented modular design
-- Suitable for Jupyter + GUI (Gradio) integration
+- 상태 객체와 계산 알고리즘의 명확한 분리
+- 단방향 데이터 흐름 구조
+- 각 단계별 메타데이터 자동 추적
+- 연구 확장성을 고려한 모듈형 설계
+- Jupyter Notebook 및 Gradio GUI 확장 가능
 
 ---
 
-## Installation (Development Mode)
-
-Clone the repository and install in editable mode:
+## 설치 방법 (개발 모드)
 
 ```bash
 git clone https://github.com/<your-username>/fmriroi.git
@@ -53,14 +52,14 @@ pip install -e .
 
 ---
 
-## Quick Example
+## 사용 예시 (Quick Example)
 
 ```python
 import numpy as np
 from fmriroi import FMRIData
 
-# Example data
-X = np.random.randn(200, 500)        # (T x V)
+# 예시 데이터
+X = np.random.randn(200, 500)      # (T x V)
 coords = np.random.randint(0, 64, size=(500, 3))
 
 fmri = FMRIData(X, coords).validate()
@@ -78,39 +77,39 @@ score = clu.report_silhouette()
 
 ---
 
-# Architecture
+# 아키텍처 설명
 
 ## Layer 1 – Data Model
 
-Handles input validation and standardized internal data representation.
+입력 데이터를 내부 표준 포맷으로 정리하고 검증합니다.
 
-Main functions:
+주요 기능:
 
 * `make_fmri_tensor`
 * `make_roi_table`
 * `validate_data`
 * `split_train_test`
 
-Main class:
+주요 클래스:
 
 * `FMRIData`
 
 ---
 
-## Layer 2 – Transform
+## Layer 2 – Transform (전처리)
 
-Preprocessing and dimensionality reduction.
+스무딩 및 차원축소를 수행합니다.
 
-Implemented methods:
+지원 기능:
 
 * Gaussian smoothing
 * B-spline basis expansion
-* Fourier basis expansion (planned)
+* Fourier basis expansion (예정)
 * fPCA
-* fICA (planned)
+* fICA (예정)
 * Standardization
 
-Main class:
+주요 클래스:
 
 * `PreprocessedData`
 
@@ -118,18 +117,18 @@ Main class:
 
 ## Layer 3 – Similarity Computation
 
-Generates similarity or distance matrices.
+특징 벡터 또는 시계열 간 유사도/거리 행렬을 생성합니다.
 
-Supported metrics:
+지원 방법:
 
 * Pearson correlation
 * Partial correlation
 * Cosine similarity
 * L2 distance
-* SRVF distance (planned)
-* Affinity transformation (RBF, scaling)
+* SRVF distance (예정)
+* Affinity 변환 (RBF 등)
 
-Main class:
+주요 클래스:
 
 * `SimilarityResult`
 
@@ -137,17 +136,17 @@ Main class:
 
 ## Layer 4 – Clustering
 
-Graph-based and feature-based clustering.
+유사도 행렬 또는 특징 공간을 기반으로 클러스터링을 수행합니다.
 
-Implemented methods:
+지원 방법:
 
-* Spectral clustering (Craddock 26-neighbor constraint)
-* Spectral clustering (unconstrained)
-* K-means (planned)
+* Spectral clustering (Craddock 26-neighbor 제약)
+* Spectral clustering (비제약)
+* K-means (예정)
 * Hierarchical clustering
-* Cluster postprocessing
+* Cluster 후처리
 
-Main class:
+주요 클래스:
 
 * `ClusteringResult`
 
@@ -155,24 +154,25 @@ Main class:
 
 ## Layer 5 – Visualization & Reporting
 
-Visualization:
+시각화 기능:
 
-* Similarity heatmaps
+* Similarity heatmap
 * Dendrogram
-* 3D voxel scatter
-* Cluster-colored voxel plots
-* Figure saving utilities
+* 3D voxel scatter plot
+* Cluster 색상 시각화
+* Figure 저장 기능
 
-Metrics:
+평가 지표:
 
 * Silhouette score
 * DICE coefficient
 
 ---
 
-# Project Structure
+# 프로젝트 구조
 
 ```
+
 src/fmriroi/
 ├── data/
 ├── transform/
@@ -181,44 +181,44 @@ src/fmriroi/
 ├── viz/
 ├── metrics/
 ├── utils/
+
 ```
 
-* `data/` contains layer state classes.
-* Other modules contain computational engines.
-* `__init__.py` files expose a clean public API.
+* `data/`는 레이어 상태 객체를 포함합니다.
+* 다른 모듈은 실제 계산 엔진을 포함합니다.
+* `__init__.py`는 외부에 노출되는 API를 정리합니다.
 
 ---
 
-# Development Workflow
+# 개발 가이드
 
-Recommended workflow:
+권장 개발 흐름:
 
-1. Implement computational functions inside appropriate modules.
-2. Connect them through layer class methods.
-3. Commit frequently with meaningful messages.
-4. Use feature branches for new algorithms.
-
----
-
-# Roadmap
-
-* Fourier basis expansion
-* fICA implementation
-* SRVF optimization
-* GPU acceleration (future)
-* Gradio GUI integration
+1. 계산 알고리즘은 각 레이어 모듈에 구현
+2. 레이어 클래스 메서드를 통해 연결
+3. 기능 단위로 커밋
+4. 새로운 알고리즘은 feature 브랜치에서 개발
 
 ---
 
-# License
+# 향후 계획 (Roadmap)
+
+* Fourier basis 확장
+* fICA 구현
+* SRVF 최적화
+* GPU 가속 지원
+* Gradio 기반 GUI 통합
+
+---
+
+# 라이선스
 
 (To be specified)
 
 ---
 
-# Author
+# 작성자
 
 Hyunseok Yoon
 
 ```
-
