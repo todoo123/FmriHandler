@@ -1,4 +1,3 @@
-```markdown
 # fmriroi
 
 Layered fMRI ROI Clustering Framework
