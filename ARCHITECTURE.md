@@ -3,7 +3,7 @@
 ## TL;DR (핵심 요약)
 
 - 데이터 흐름:
-  `FMRIData → PreprocessedData → SimilarityResult → ClusteringResult`
+  `FmriVoxelData → PreprocessedData → SimilarityResult → ClusteringResult`
 - 각 레이어 클래스는 "흐름 제어(오케스트레이션)"만 담당한다.
 - 실제 계산은 별도 모듈(엔진 함수)에서 수행한다.
 - 순환 import를 허용하지 않는다.
@@ -23,7 +23,7 @@
 
 데이터는 아래와 같은 단방향 파이프라인을 따른다.
 
-FMRIData
+FmriVoxelData
 → PreprocessedData
 → SimilarityResult
 → ClusteringResult
@@ -40,7 +40,7 @@ FMRIData
 상태 객체(레이어 클래스)를 정의하는 모듈.
 
 클래스:
-- `FMRIData`
+- `FmriVoxelData`
 - `PreprocessedData`
 - `SimilarityResult`
 - `ClusteringResult`
@@ -144,7 +144,7 @@ FMRIData
 
 각 레이어 클래스는 얇은 오케스트레이션 메서드를 가진다.
 
-- `FMRIData.preprocess(method, **kwargs)`
+- `FmriVoxelData.preprocess(method, **kwargs)`
 - `PreprocessedData.compute_similarity(method, **kwargs)`
 - `SimilarityResult.cluster(method, **kwargs)`
 - `ClusteringResult.plot_*() / report_*()`

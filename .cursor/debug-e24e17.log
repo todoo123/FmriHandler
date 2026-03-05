@@ -1,0 +1,3 @@
+{"sessionId": "e24e17", "runId": "run1", "hypothesisId": "H1", "location": "debug_run.py", "message": "Successfully imported FmriVoxelData", "data": {}, "timestamp": 1772704628039}
+{"sessionId": "e24e17", "runId": "run1", "hypothesisId": "H2", "location": "debug_run.py", "message": "Successfully instantiated and validated FmriVoxelData", "data": {}, "timestamp": 1772704628336}
+{"sessionId": "e24e17", "runId": "run1", "hypothesisId": "H3", "location": "debug_run.py", "message": "Successfully preprocessed data", "data": {"shape": [2, 5, 10]}, "timestamp": 1772704637049}

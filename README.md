@@ -20,7 +20,7 @@ Layered fMRI ROI Clustering Framework
 
 ```
 
-FMRIData
+FmriVoxelData
 → PreprocessedData
 → SimilarityResult
 → ClusteringResult
@@ -56,13 +56,13 @@ pip install -e .
 
 ```python
 import numpy as np
-from fmriroi import FMRIData
+from fmriroi import FmriVoxelData
 
 # 예시 데이터
 X = np.random.randn(200, 500)      # (T x V)
 coords = np.random.randint(0, 64, size=(500, 3))
 
-fmri = FMRIData(X, coords).validate()
+fmri = FmriVoxelData(X, coords).validate()
 
 prep = fmri.preprocess("bspline", n_basis=10)
 
@@ -92,7 +92,7 @@ score = clu.report_silhouette()
 
 주요 클래스:
 
-* `FMRIData`
+* `FmriVoxelData`
 
 ---
 

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fmrihandler"
+version = "0.1.0"
+description = "fMRI data handling and analysis package"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    # 프로젝트 실행에 필요한 외부 라이브러리들을 여기에 적어주세요.
+    # 예시:
+    "numpy>=1.20.0",
+    "pandas",
+    "scipy.ndimage"
+    # "nibabel",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+# 패키지로 인식할 폴더들을 명시적으로 적어줍니다. (테스트 폴더나 R코드 폴더 제외)
+include = ["data*", "cluster*", "transform*", "similarity*", "metrics*", "viz*"]
