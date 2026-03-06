@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from .preprocessed import PreprocessedData
 
 
 @dataclass(slots=True)
@@ -30,6 +33,9 @@ class FmriVoxelData:
     ) -> "PreprocessedData":
         """Dispatch to layer-2 object with method metadata."""
         from .preprocessed import PreprocessedData
+
+        # Ensure downstream layers always receive validated tensor shapes.
+        self.validate()
 
         return PreprocessedData(
             data=self.data,

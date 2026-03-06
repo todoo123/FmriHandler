@@ -104,6 +104,11 @@ class SimilarityResult:
             preprocess_hyper=dict(self.preprocess_hyper),
             similarity_method=self.similarity_method,
             similarity_hyper=dict(self.similarity_hyper),
+            similarity_matrices=(
+                None
+                if self.similarity_matrices is None
+                else list(self.similarity_matrices)
+            ),
             label=labels,
             cluster_hyper=resolved_cluster_hyper,
         )

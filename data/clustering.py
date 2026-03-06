@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
+from scipy.sparse import csr_matrix
 
 
 @dataclass(slots=True)
@@ -16,6 +17,7 @@ class ClusteringResult:
     preprocess_hyper: dict[str, Any] = field(default_factory=dict)
     similarity_method: str = ""
     similarity_hyper: dict[str, Any] = field(default_factory=dict)
+    similarity_matrices: list[csr_matrix] | None = None
     label: np.ndarray = field(default_factory=lambda: np.empty(0, dtype=int))
     cluster_hyper: dict[str, Any] = field(default_factory=dict)
 
@@ -50,6 +52,7 @@ class ClusteringResult:
             "n_timepoints": n_timepoints,
             "preprocess_method": self.preprocess_method,
             "similarity_method": self.similarity_method,
+            "n_similarity_matrices": 0 if self.similarity_matrices is None else len(self.similarity_matrices),
             "label_shape": tuple(self.label.shape),
             "n_labels_total": n_assigned,
             "n_labels_per_subject": n_assigned_per_subject.tolist(),
