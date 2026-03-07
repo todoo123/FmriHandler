@@ -15,6 +15,7 @@ dependencies = [
     "pandas",
     "scipy.ndimage",
     "plotly",
+    "gradio",
     # "nibabel",
 ]
 
