@@ -213,9 +213,15 @@ def build_demo() -> gr.Blocks:
                 label="Preprocess Method",
             )
             gr.Markdown("### Preprocess Hyperparameters")
-            preprocess_basic = create_hyperparam_widgets(max_params=MAX_BASIC_PARAMS)
+            preprocess_basic = create_hyperparam_widgets(
+                max_params=MAX_BASIC_PARAMS,
+                initial_specs=_filter_specs(preprocess_default, "preprocess", advanced=False),
+            )
             with gr.Accordion("Preprocess Advanced Hyperparameters", open=False):
-                preprocess_adv = create_hyperparam_widgets(max_params=MAX_ADV_PARAMS)
+                preprocess_adv = create_hyperparam_widgets(
+                    max_params=MAX_ADV_PARAMS,
+                    initial_specs=_filter_specs(preprocess_default, "preprocess", advanced=True),
+                )
 
             similarity_method = gr.Dropdown(
                 choices=list_method_choices("similarity"),
@@ -223,9 +229,15 @@ def build_demo() -> gr.Blocks:
                 label="Similarity Method",
             )
             gr.Markdown("### Similarity Hyperparameters")
-            similarity_basic = create_hyperparam_widgets(max_params=MAX_BASIC_PARAMS)
+            similarity_basic = create_hyperparam_widgets(
+                max_params=MAX_BASIC_PARAMS,
+                initial_specs=_filter_specs(similarity_default, "similarity", advanced=False),
+            )
             with gr.Accordion("Similarity Advanced Hyperparameters", open=False):
-                similarity_adv = create_hyperparam_widgets(max_params=MAX_ADV_PARAMS)
+                similarity_adv = create_hyperparam_widgets(
+                    max_params=MAX_ADV_PARAMS,
+                    initial_specs=_filter_specs(similarity_default, "similarity", advanced=True),
+                )
 
             run_pre_sim_button = gr.Button("Run Preprocess + Similarity", variant="primary")
             pre_sim_status = gr.Textbox(label="Status", lines=6, interactive=False)
@@ -238,9 +250,15 @@ def build_demo() -> gr.Blocks:
                 label="Clustering Method",
             )
             gr.Markdown("### Clustering Hyperparameters")
-            clustering_basic = create_hyperparam_widgets(max_params=MAX_BASIC_PARAMS)
+            clustering_basic = create_hyperparam_widgets(
+                max_params=MAX_BASIC_PARAMS,
+                initial_specs=_filter_specs(clustering_default, "clustering", advanced=False),
+            )
             with gr.Accordion("Clustering Advanced Hyperparameters", open=False):
-                clustering_adv = create_hyperparam_widgets(max_params=MAX_ADV_PARAMS)
+                clustering_adv = create_hyperparam_widgets(
+                    max_params=MAX_ADV_PARAMS,
+                    initial_specs=_filter_specs(clustering_default, "clustering", advanced=True),
+                )
             run_clustering_button = gr.Button("Run Clustering", variant="primary")
             clustering_status = gr.Textbox(label="Status", lines=6, interactive=False)
             clustering_summary = gr.JSON(label="Clustering Summary")
@@ -251,9 +269,15 @@ def build_demo() -> gr.Blocks:
                 label="Report Method",
             )
             gr.Markdown("### Report Hyperparameters")
-            report_basic = create_hyperparam_widgets(max_params=MAX_BASIC_PARAMS)
+            report_basic = create_hyperparam_widgets(
+                max_params=MAX_BASIC_PARAMS,
+                initial_specs=_filter_specs(report_default, "report", advanced=False),
+            )
             with gr.Accordion("Report Advanced Hyperparameters", open=False):
-                report_adv = create_hyperparam_widgets(max_params=MAX_ADV_PARAMS)
+                report_adv = create_hyperparam_widgets(
+                    max_params=MAX_ADV_PARAMS,
+                    initial_specs=_filter_specs(report_default, "report", advanced=True),
+                )
             run_report_button = gr.Button("Run Report", variant="secondary")
             report_status = gr.Textbox(label="Status", lines=6, interactive=False)
             report_json = gr.JSON(label="Report Output")
@@ -265,9 +289,15 @@ def build_demo() -> gr.Blocks:
                 label="Visualization Method",
             )
             gr.Markdown("### Visualization Hyperparameters")
-            viz_basic = create_hyperparam_widgets(max_params=MAX_BASIC_PARAMS)
+            viz_basic = create_hyperparam_widgets(
+                max_params=MAX_BASIC_PARAMS,
+                initial_specs=_filter_specs(viz_default, "visualization", advanced=False),
+            )
             with gr.Accordion("Visualization Advanced Hyperparameters", open=False):
-                viz_adv = create_hyperparam_widgets(max_params=MAX_ADV_PARAMS)
+                viz_adv = create_hyperparam_widgets(
+                    max_params=MAX_ADV_PARAMS,
+                    initial_specs=_filter_specs(viz_default, "visualization", advanced=True),
+                )
             run_viz_button = gr.Button("Render Figure", variant="primary")
             viz_status = gr.Textbox(label="Status", lines=6, interactive=False)
             viz_figure = gr.Plot(label="Figure")
@@ -340,27 +370,6 @@ def build_demo() -> gr.Blocks:
             fn=_on_run_visualization,
             inputs=[state, viz_method, *viz_basic.as_inputs(), *viz_adv.as_inputs()],
             outputs=[state, viz_figure, viz_status, snapshot_box],
-        )
-
-        demo.load(
-            fn=lambda: _update_hyper_widgets("preprocess", preprocess_default),
-            outputs=[*preprocess_basic.as_outputs(), *preprocess_adv.as_outputs()],
-        )
-        demo.load(
-            fn=lambda: _update_hyper_widgets("similarity", similarity_default),
-            outputs=[*similarity_basic.as_outputs(), *similarity_adv.as_outputs()],
-        )
-        demo.load(
-            fn=lambda: _update_hyper_widgets("clustering", clustering_default),
-            outputs=[*clustering_basic.as_outputs(), *clustering_adv.as_outputs()],
-        )
-        demo.load(
-            fn=lambda: _update_hyper_widgets("report", report_default),
-            outputs=[*report_basic.as_outputs(), *report_adv.as_outputs()],
-        )
-        demo.load(
-            fn=lambda: _update_hyper_widgets("visualization", viz_default),
-            outputs=[*viz_basic.as_outputs(), *viz_adv.as_outputs()],
         )
 
     demo.queue()

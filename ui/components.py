@@ -25,45 +25,6 @@ class HyperParamWidgets:
         return self.as_inputs()
 
 
-def create_hyperparam_widgets(max_params: int = 8) -> HyperParamWidgets:
-    keys: list[gr.Textbox] = []
-    texts: list[gr.Textbox] = []
-    numbers: list[gr.Number] = []
-    bools: list[gr.Checkbox] = []
-    choices: list[gr.Dropdown] = []
-
-    for idx in range(max_params):
-        keys.append(
-            gr.Textbox(
-                visible=False,
-                value="",
-                label=f"key_{idx}",
-                interactive=False,
-            )
-        )
-        texts.append(gr.Textbox(visible=False, label=f"text_{idx}", value=""))
-        numbers.append(gr.Number(visible=False, label=f"num_{idx}", value=None))
-        bools.append(gr.Checkbox(visible=False, label=f"bool_{idx}", value=False))
-        choices.append(
-            gr.Dropdown(
-                visible=False,
-                label=f"choice_{idx}",
-                choices=[],
-                value=None,
-                allow_custom_value=False,
-            )
-        )
-
-    return HyperParamWidgets(
-        max_params=max_params,
-        keys=keys,
-        texts=texts,
-        numbers=numbers,
-        bools=bools,
-        choices=choices,
-    )
-
-
 def _resolve_input_kind(spec: HyperParamSpec) -> str:
     if spec.input_kind != "auto":
         return spec.input_kind
@@ -90,27 +51,126 @@ def _spec_label(spec: HyperParamSpec) -> str:
     return spec.label
 
 
+def create_hyperparam_widgets(
+    max_params: int = 8,
+    initial_specs: list[HyperParamSpec] | None = None,
+) -> HyperParamWidgets:
+    """Create a fixed pool of hyperparameter widgets.
+
+    When *initial_specs* is provided, widgets for those slots are rendered
+    visible and pre-filled with correct defaults from the start, avoiding any
+    reliance on a post-load event to make them appear.
+    """
+    specs = initial_specs or []
+    keys: list[gr.Textbox] = []
+    texts: list[gr.Textbox] = []
+    numbers: list[gr.Number] = []
+    bools: list[gr.Checkbox] = []
+    choices: list[gr.Dropdown] = []
+
+    for idx in range(max_params):
+        if idx < len(specs):
+            spec = specs[idx]
+            kind = _resolve_input_kind(spec)
+            info = spec.help_text or None
+            label = _spec_label(spec)
+
+            keys.append(
+                gr.Textbox(
+                    visible=False,
+                    value=spec.name,
+                    label=f"key_{idx}",
+                    interactive=False,
+                )
+            )
+            texts.append(
+                gr.Textbox(
+                    visible=(kind == "text"),
+                    label=label,
+                    value=_normalize_text_default(spec),
+                    info=info,
+                )
+            )
+            numbers.append(
+                gr.Number(
+                    visible=(kind == "number"),
+                    label=label,
+                    value=spec.default if kind == "number" else None,
+                    info=info,
+                )
+            )
+            bools.append(
+                gr.Checkbox(
+                    visible=(kind == "checkbox"),
+                    label=label,
+                    value=(bool(spec.default) if spec.default is not None else False) if kind == "checkbox" else False,
+                    info=info,
+                )
+            )
+            choices.append(
+                gr.Dropdown(
+                    visible=(kind == "dropdown"),
+                    label=label,
+                    choices=spec.choices,
+                    value=spec.default if kind == "dropdown" else None,
+                    allow_custom_value=False,
+                    info=info,
+                )
+            )
+        else:
+            keys.append(
+                gr.Textbox(
+                    visible=False,
+                    value="",
+                    label=f"key_{idx}",
+                    interactive=False,
+                )
+            )
+            texts.append(gr.Textbox(visible=False, label=f"text_{idx}", value=""))
+            numbers.append(gr.Number(visible=False, label=f"num_{idx}", value=None))
+            bools.append(gr.Checkbox(visible=False, label=f"bool_{idx}", value=False))
+            choices.append(
+                gr.Dropdown(
+                    visible=False,
+                    label=f"choice_{idx}",
+                    choices=[],
+                    value=None,
+                    allow_custom_value=False,
+                )
+            )
+
+    return HyperParamWidgets(
+        max_params=max_params,
+        keys=keys,
+        texts=texts,
+        numbers=numbers,
+        bools=bools,
+        choices=choices,
+    )
+
+
 def build_widget_updates(specs: list[HyperParamSpec], max_params: int) -> list[dict[str, Any]]:
-    """Build gr.update payloads for key/text/number/bool/choice slots."""
-    updates: list[dict[str, Any]] = []
+    """Build gr.update payloads for key/text/number/bool/choice slots.
+
+    Returns updates in **type-major** order — all keys, then all texts, then all
+    numbers, then all bools, then all choices — matching the layout produced by
+    HyperParamWidgets.as_outputs().
+    """
     visible_specs = specs[:max_params]
+    key_updates: list[Any] = []
+    text_updates: list[Any] = []
+    number_updates: list[Any] = []
+    bool_updates: list[Any] = []
+    choice_updates: list[Any] = []
 
     for idx in range(max_params):
         if idx >= len(visible_specs):
-            updates.extend(
-                [
-                    gr.update(value="", visible=False),
-                    gr.update(value="", visible=False, label=f"text_{idx}", info=None),
-                    gr.update(value=None, visible=False, label=f"num_{idx}", info=None),
-                    gr.update(value=False, visible=False, label=f"bool_{idx}", info=None),
-                    gr.update(
-                        value=None,
-                        choices=[],
-                        visible=False,
-                        label=f"choice_{idx}",
-                        info=None,
-                    ),
-                ]
+            key_updates.append(gr.update(value="", visible=False))
+            text_updates.append(gr.update(value="", visible=False, label=f"text_{idx}", info=None))
+            number_updates.append(gr.update(value=None, visible=False, label=f"num_{idx}", info=None))
+            bool_updates.append(gr.update(value=False, visible=False, label=f"bool_{idx}", info=None))
+            choice_updates.append(
+                gr.update(value=None, choices=[], visible=False, label=f"choice_{idx}", info=None)
             )
             continue
 
@@ -119,8 +179,8 @@ def build_widget_updates(specs: list[HyperParamSpec], max_params: int) -> list[d
         info = spec.help_text if spec.help_text else None
         label = _spec_label(spec)
 
-        updates.append(gr.update(value=spec.name, visible=False))
-        updates.append(
+        key_updates.append(gr.update(value=spec.name, visible=False))
+        text_updates.append(
             gr.update(
                 value=_normalize_text_default(spec),
                 visible=kind == "text",
@@ -128,25 +188,25 @@ def build_widget_updates(specs: list[HyperParamSpec], max_params: int) -> list[d
                 info=info,
             )
         )
-        updates.append(
+        number_updates.append(
             gr.update(
-                value=spec.default,
+                value=spec.default if kind == "number" else None,
                 visible=kind == "number",
                 label=label,
                 info=info,
             )
         )
-        updates.append(
+        bool_updates.append(
             gr.update(
-                value=bool(spec.default) if spec.default is not None else False,
+                value=(bool(spec.default) if spec.default is not None else False) if kind == "checkbox" else False,
                 visible=kind == "checkbox",
                 label=label,
                 info=info,
             )
         )
-        updates.append(
+        choice_updates.append(
             gr.update(
-                value=spec.default,
+                value=spec.default if kind == "dropdown" else None,
                 choices=spec.choices,
                 visible=kind == "dropdown",
                 label=label,
@@ -154,7 +214,7 @@ def build_widget_updates(specs: list[HyperParamSpec], max_params: int) -> list[d
             )
         )
 
-    return updates
+    return [*key_updates, *text_updates, *number_updates, *bool_updates, *choice_updates]
 
 
 def split_widget_values(

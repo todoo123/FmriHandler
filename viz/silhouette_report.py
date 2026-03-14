@@ -63,7 +63,7 @@ def _silhouette_cluster_strict_similarity(
     if uniq.size == 0:
         return {
             "overall": float("nan"),
-            "per_cluster": {},
+            "per_cluster": {},  # str keys
             "a": {},
             "b": {},
             "n_k": {},
@@ -75,19 +75,20 @@ def _silhouette_cluster_strict_similarity(
     else:
         S_one = S @ one
 
-    per_cluster: dict[int, float] = {}
-    a: dict[int, float] = {}
-    b: dict[int, float] = {}
-    n_k_out: dict[int, int] = {}
+    per_cluster: dict[str, float] = {}
+    a: dict[str, float] = {}
+    b: dict[str, float] = {}
+    n_k_out: dict[str, int] = {}
 
     for k in uniq:
+        key = str(int(k))
         mask = L == int(k)
         n_k = int(np.count_nonzero(mask))
-        n_k_out[int(k)] = n_k
+        n_k_out[key] = n_k
         if n_k <= 1 or n_k >= n_voxels:
-            a[int(k)] = float("nan")
-            b[int(k)] = float("nan")
-            per_cluster[int(k)] = float("nan")
+            a[key] = float("nan")
+            b[key] = float("nan")
+            per_cluster[key] = float("nan")
             continue
 
         z = mask.astype(np.float64, copy=False)
@@ -106,9 +107,9 @@ def _silhouette_cluster_strict_similarity(
         denom = max(a_k, b_k)
         s_k = (a_k - b_k) / denom if np.isfinite(denom) and denom != 0.0 else float("nan")
 
-        a[int(k)] = a_k
-        b[int(k)] = b_k
-        per_cluster[int(k)] = s_k
+        a[key] = a_k
+        b[key] = b_k
+        per_cluster[key] = s_k
 
     valid_scores = np.array(list(per_cluster.values()), dtype=np.float64)
     overall = float(np.nanmean(valid_scores)) if np.isfinite(valid_scores).any() else float("nan")
